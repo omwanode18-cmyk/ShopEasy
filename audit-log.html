@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activity Log — ShopEasy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">🛒</div>
+      <a href="index.html" class="site-name">ShopEasy</a>
+    </div>
+    <nav class="header-nav">
+      <a href="index.html" class="nav-link">← Back to Shop</a>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <h2 class="section-title">📋 Activity Log</h2>
+      <button class="btn-refresh" id="refresh-btn" onclick="loadLog()">↻ Refresh</button>
+    </div>
+
+    <p class="audit-subtitle">
+      A real-time record of AI interactions and payment events. Stored in server memory — resets when the server restarts.
+    </p>
+
+    <!-- Status bar -->
+    <div class="audit-status" id="audit-status"></div>
+
+    <!-- Empty state -->
+    <div class="audit-empty" id="audit-empty" style="display:none;">
+      <div style="font-size:2.5rem;">🕵️</div>
+      <p>No activity yet. Start shopping or chat with the assistant!</p>
+      <a href="index.html" class="btn-primary" style="margin-top:4px;">Go to Shop</a>
+    </div>
+
+    <!-- Log table -->
+    <div class="audit-table-wrap" id="audit-table-wrap" style="display:none;">
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Event</th>
+            <th>Description</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="audit-tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // ── Action type metadata ─────────────────────────────────
+    const ACTION_META = {
+      AI_PRODUCT_LOOKUP: { label: "AI Lookup",        color: "#3b82f6" },
+      AI_ADD_TO_CART:    { label: "AI Add to Cart",   color: "#8b5cf6" },
+      CHECKOUT_STARTED:  { label: "Checkout Started", color: "#f59e0b" },
+      PAYMENT_SUCCESS:   { label: "Payment Success",  color: "#10b981" },
+      PAYMENT_FAILED:    { label: "Payment Failed",   color: "#ef4444" },
+    };
+
+    function formatTs(iso) {
+      const d = new Date(iso);
+      const date = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+      const time = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      return `<span class="ts-date">${date}</span><span class="ts-time">${time}</span>`;
+    }
+
+    function formatAmount(amount) {
+      if (amount === null || amount === undefined) return "<span class='amt-nil'>—</span>";
+      return `<span class='amt-val'>₹${Number(amount).toFixed(2)}</span>`;
+    }
+
+    function renderBadge(actionType) {
+      const meta = ACTION_META[actionType] || { label: actionType, color: "#6b7280" };
+      return `<span class="audit-badge" style="background:${meta.color}20;color:${meta.color};border:1px solid ${meta.color}40">${meta.label}</span>`;
+    }
+
+    async function loadLog() {
+      const status = document.getElementById("audit-status");
+      const empty  = document.getElementById("audit-empty");
+      const wrap   = document.getElementById("audit-table-wrap");
+      const tbody  = document.getElementById("audit-tbody");
+      const btn    = document.getElementById("refresh-btn");
+
+      btn.disabled    = true;
+      btn.textContent = "Loading…";
+      status.textContent = "";
+
+      try {
+        const res  = await fetch("/api/audit-log");
+        if (!res.ok) throw new Error("Server returned " + res.status);
+        const data = await res.json();
+
+        btn.disabled    = false;
+        btn.textContent = "↻ Refresh";
+
+        if (data.length === 0) {
+          empty.style.display = "flex";
+          wrap.style.display  = "none";
+          return;
+        }
+
+        empty.style.display = "none";
+        wrap.style.display  = "block";
+        tbody.innerHTML = "";
+
+        data.forEach((entry) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="td-time">${formatTs(entry.timestamp)}</td>
+            <td class="td-event">${renderBadge(entry.actionType)}</td>
+            <td class="td-desc">${escHtml(entry.description)}</td>
+            <td class="td-amount">${formatAmount(entry.amount)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const last = new Date().toLocaleTimeString("en-IN");
+        status.textContent = `${data.length} event${data.length !== 1 ? "s" : ""} — last refreshed at ${last}`;
+
+      } catch (err) {
+        btn.disabled    = false;
+        btn.textContent = "↻ Refresh";
+        status.textContent = "⚠️ Could not reach server. Is it running?";
+        status.style.color = "#ef4444";
+      }
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    // Auto-load on page open
+    loadLog();
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed — ShopEasy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">🛒</div>
+      <a href="index.html" class="site-name">ShopEasy</a>
+    </div>
+  </header>
+
+  <!-- SUCCESS CONTENT -->
+  <main class="main">
+    <div class="success-card" id="success-card">
+
+      <div class="success-checkmark">✅</div>
+      <h1 class="success-title">Order Confirmed!</h1>
+      <p class="success-subtitle">Thank you for your purchase. Your payment was successful.</p>
+
+      <!-- Payment ID -->
+      <div class="success-payment-id">
+        <span class="payment-id-label">Payment ID</span>
+        <span class="payment-id-value" id="payment-id">—</span>
+      </div>
+
+      <!-- Order items -->
+      <div class="success-order-box">
+        <h3 class="success-order-title">Items Ordered</h3>
+        <div id="success-items"></div>
+        <div class="order-divider" style="margin: 12px 0;"></div>
+        <div class="summary-row summary-total">
+          <span>Total Paid</span>
+          <span id="success-total">₹0.00</span>
+        </div>
+      </div>
+
+      <a href="index.html" class="btn-primary" id="continue-btn">🛍 Continue Shopping</a>
+    </div>
+  </main>
+
+  <script>
+    function formatPrice(n) { return "₹" + Number(n).toFixed(2); }
+
+    // Read order info saved by checkout.js
+    let order = null;
+    try {
+      order = JSON.parse(localStorage.getItem("shopeasy_last_order") || "null");
+    } catch (_) {}
+
+    if (order) {
+      document.getElementById("payment-id").textContent = order.paymentId || "—";
+
+      const container = document.getElementById("success-items");
+      (order.items || []).forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "order-item-row";
+        row.innerHTML = `
+          <span class="order-item-emoji">${item.emoji}</span>
+          <span class="order-item-name">${item.name}</span>
+          <span class="order-item-qty">x${item.qty}</span>
+          <span class="order-item-price">${formatPrice(item.price * item.qty)}</span>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById("success-total").textContent = formatPrice(order.total || 0);
+    }
+
+    // Clear the stored order when user leaves
+    document.getElementById("continue-btn").addEventListener("click", () => {
+      localStorage.removeItem("shopeasy_last_order");
+    });
+  </script>
+</body>
+</html>

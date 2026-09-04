@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart — ShopEasy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">🛒</div>
+      <a href="index.html" class="site-name">ShopEasy</a>
+    </div>
+    <nav class="header-nav">
+      <a href="index.html" class="nav-link">Shop</a>
+    </nav>
+    <a href="cart.html" class="cart-icon active-page" style="text-decoration:none;">
+      🛒
+      <span class="cart-count" id="cart-count">0</span>
+    </a>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <h2 class="section-title">Your Cart</h2>
+      <a href="index.html" class="back-link">← Continue Shopping</a>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🛒</div>
+      <p>Your cart is empty.</p>
+      <a href="index.html" class="btn-primary">Browse Products</a>
+    </div>
+
+    <!-- Cart content -->
+    <div class="cart-page-content" id="cart-page-content">
+      <div class="cart-items-list" id="cart-items-list"></div>
+
+      <!-- Summary -->
+      <div class="cart-summary-box">
+        <div class="summary-row">
+          <span>Subtotal (<span id="item-count">0</span> items)</span>
+          <span id="subtotal-price">$0.00</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total</span>
+          <span id="total-price">$0.00</span>
+        </div>
+        <a href="checkout.html" class="btn-primary btn-full">Proceed to Checkout →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="cart.js"></script>
+</body>
+</html>

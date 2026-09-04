@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopEasy</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:  '#1a1a2e',
+            coral: '#e14868',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Keep style.css for chat widget, cart dropdown, toast, etc. -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
+  <header class="bg-[#1a1a2e] px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-lg">
+
+    <!-- Logo -->
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🛒</span>
+      <a href="index.html" class="text-white font-bold text-xl tracking-tight">ShopEasy</a>
+    </div>
+
+    <!-- Centre nav -->
+    <nav class="hidden md:flex items-center gap-8">
+      <a href="index.html"
+         class="text-white font-semibold underline underline-offset-4 decoration-[#e14868]">
+        Featured
+      </a>
+      <a href="cart.html"
+         class="text-gray-300 hover:text-white transition-colors">My Cart</a>
+      <a href="audit-log.html"
+         class="text-gray-300 hover:text-white transition-colors">Activity Log</a>
+    </nav>
+
+    <!-- Right: cart icon + action buttons -->
+    <div class="flex items-center gap-3">
+      <!-- Cart icon badge -->
+      <div id="cart-icon" onclick="toggleCart()"
+           class="relative cursor-pointer text-gray-300 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7h12M7 13H5.4M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
+        </svg>
+        <span id="cart-count"
+              class="cart-count absolute -top-2 -right-2 bg-[#e14868] text-white text-[10px]
+                     font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+      </div>
+
+      <a href="flights.html"
+         class="bg-[#e14868] hover:bg-[#c73652] text-white text-sm font-semibold
+                px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+        Book Flight
+      </a>
+    </div>
+  </header>
+
+  <!-- ── CART DROPDOWN (keep existing — styled by style.css) ── -->
+  <div class="cart-dropdown" id="cart-dropdown">
+    <h3>Your Cart</h3>
+    <ul id="cart-items"></ul>
+    <div class="cart-total" id="cart-total"></div>
+    <p class="cart-empty" id="cart-empty">Your cart is empty.</p>
+    <a href="cart.html" class="dropdown-view-cart" id="dropdown-view-cart">View Cart →</a>
+  </div>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-10">
+    <h2 class="text-4xl font-extrabold text-[#1a1a2e] mb-2">Featured Products</h2>
+    <p class="text-gray-500 mb-8 max-w-lg leading-relaxed">
+      Discover our latest collection of premium essentials, curated for a seamless lifestyle.
+    </p>
+
+    <!-- Product grid — rendered by app.js -->
+    <div id="product-grid"
+         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    </div>
+  </main>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="bg-gray-100 border-t border-gray-200 px-6 py-5 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <span class="font-bold text-[#1a1a2e] text-lg">ShopEasy</span>
+
+      <div class="flex flex-wrap items-center justify-center gap-5 text-sm text-gray-500">
+        <a href="#" class="hover:text-[#e14868] transition-colors">About Us</a>
+        <a href="#" class="hover:text-[#e14868] transition-colors">Contact</a>
+        <a href="#" class="hover:text-[#e14868] transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-[#e14868] transition-colors">Terms of Service</a>
+      </div>
+
+      <span class="text-sm text-gray-400">© 2024 ShopEasy. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- ── TOAST (styled by style.css) ──────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ── AI CHAT WIDGET ────────────────────────────────────── -->
+  <div class="chat-widget" id="chat-widget">
+    <button class="chat-toggle-btn" id="chat-toggle-btn"
+            onclick="toggleChat()" aria-label="Open chat assistant"
+            style="background:#e14868;">
+      💬
+    </button>
+    <div class="chat-panel" id="chat-panel" aria-live="polite">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <span class="chat-avatar">🤖</span>
+          <div>
+            <div class="chat-header-name">ShopEasy Assistant</div>
+            <div class="chat-header-status">● Online</div>
+          </div>
+        </div>
+        <button class="chat-close-btn" onclick="toggleChat()" aria-label="Close chat">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input"
+               placeholder="Ask me about products…" autocomplete="off"
+               onkeydown="if(event.key===''Enter'') sendChatMessage()" />
+        <button class="chat-send-btn" onclick="sendChatMessage()" aria-label="Send">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="audit.js"></script>
+  <script src="app.js"></script>
+  <script src="flights-data.js"></script>
+  <script src="chat.js"></script>
+</body>
+</html>
